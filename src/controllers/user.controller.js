@@ -1,6 +1,7 @@
 const usersCtrl = {};
-
+const jwt = require('jsonwebtoken');
 const modelUser = require('../models/User')
+const moduleRol = require('../models/Role');
 
 
 usersCtrl.getUsers = async (req, res) => {
@@ -11,19 +12,32 @@ usersCtrl.getUsers = async (req, res) => {
 
 
 usersCtrl.postUsers = async (req, res) => {
-    const { username, journalist, password, email } = req.body;
-    
-    if (req.body.username, req.body.journalist, req.body.password, req.body.email != undefined) {
+    const { username, password, name, lastname, email, rol } = req.body;
+
+    if (username || password || name || lastname || email || rol != undefined) {
         const newUser = new modelUser({
             username: username,
-            journalist: journalist,
             password: password,
-            email: email
-            
+            name: name,
+            lastname: lastname,
+            email: email,
+            rol: rol
         })
-        newUser.password = await newUser.encryptPass(password)
-        await newUser.save();
-        res.json('Se ha guardado correctamente');
+        newUser.password = await newUser.encryptPass(password);
+        
+        if (rol) {
+            const foundRoles = await moduleRol.find({name: {$in: rol}})
+            newUser.rol = foundRoles.map(role => role._id)
+        } else {
+            const role = await rol.findOne({name:"User"})
+            newUser.rol = [role._id];
+        }
+
+        const savedUser = await newUser.save();
+        const token = jwt.sign({id: savedUser._id}, process.env.SECRET_WORD, {
+            expiresIn: 3600 //representados en seg
+        })
+        res.json({token});
 
     } else {
         console.log("datos salida " + req.body.username)
@@ -33,12 +47,14 @@ usersCtrl.postUsers = async (req, res) => {
 
 
 usersCtrl.putUsers = async (req, res) => {
-    const { username, journalist, password, email } = req.body;
+    const { username, password, name, lastname, email, rol } = req.body;
     await modelUser.findOneAndUpdate({ _id: req.params.id }, {
         username: username,
-        journalist: journalist,
-        password: password,
-        email: email
+            password: password,
+            name: name,
+            lastname: lastname,
+            email: email,
+            rol: rol
     })
     res.json('Se ha modificado correctamente');
 };

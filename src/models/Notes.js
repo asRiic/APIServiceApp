@@ -18,7 +18,8 @@ const noteSchema = new Schema({
         default: Date.now
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    versionKey: false
 });
 
 module.exports = model('noteModel', noteSchema);

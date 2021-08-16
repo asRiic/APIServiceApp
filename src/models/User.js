@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose');
 const bcript = require('bcryptjs');
+const { schema } = require('./Role');
 
 const userSchema = new Schema({
     username: {
@@ -7,20 +8,32 @@ const userSchema = new Schema({
         require: true,
         unique: true
     },
-    journalist: {
+    password: {
         type: String,
         required: true
     },
-    password: {
+    name: {
+        type: String,
+        required: true
+    },
+    lastname: {
         type: String,
         required: true
     },
     email: {
         type: String,
         required: true
-    }
+    },
+    rol: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Role",
+            require: true
+        },
+    ]
 }, {
-    timestamps: true
+    timestamps: true,
+    versionKey: false
 });
 
 userSchema.methods.encryptPass = async password => {

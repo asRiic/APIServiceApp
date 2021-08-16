@@ -10,12 +10,16 @@ notesCtrl.getNotes = async (req, res) => {
 
 //Funcion que crea una nueva nota
 notesCtrl.postNotes = async (req, res) =>{
-    const {tittle, content, date, author} = req.body;
+    const {tittle, content, content1, content2, author, typenews, image, videos} = req.body;
     const newNote = new modelNotes({
         tittle: tittle,
         content: content,
-        date: date,
-        author: author
+        content1: content1,
+        content2: content2,
+        author: author,
+        typenews: typenews,
+        image: image,
+        videos: videos
     })
     await newNote.save();
     res.json('Guardado');
@@ -23,12 +27,16 @@ notesCtrl.postNotes = async (req, res) =>{
 
 //Funcion que actualiza las notas
 notesCtrl.putNotes = async (req, res) => {
-    const {tittle, content, date, author} = req.body;
+    const {tittle, content, content1, content2, author, typenews, image, videos} = req.body;
     await modelNotes.findOneAndUpdate({_id: req.params.id}, {
         tittle: tittle,
         content: content,
-        date: date,
-        author: author
+        content1: content1,
+        content2: content2,
+        author: author,
+        typenews: typenews,
+        image: image,
+        videos: videos
     });
     res.json('Se ha modificado correctamente');
 }
